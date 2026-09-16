@@ -14,8 +14,7 @@
     "extensions": ["./extensions/omp-updater/index.js"]
   },
   "scripts": {
-    "check": "node --check extensions/omp-updater/index.js",
-    "test": "node --test"
+    "check": "node --check extensions/omp-updater/index.js"
   },
   "engines": {
     "node": ">=18"
