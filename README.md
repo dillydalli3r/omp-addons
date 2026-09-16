@@ -45,6 +45,11 @@ and runs each project's own setup step:
 Flags: `--dry-run` (print every action, run none), `--only <id,...>` (a subset), `--no-setup`
 (register and install only), `--local <path>` (register a local checkout instead of GitHub).
 
+Each project's own setup step is its own script with its own flags — `install-omp-addons.js` gains a
+`plugin` verb and a `--legacy-only` cutover for the token saver, `install.ps1` takes `-DryRun`,
+`-Json`, `-SkipUserEnv` and `-Uninstall` for terminal images, and `apply.mjs` takes `--check` and
+`--dry-run` for the DeepSeek override. Each repository's README documents them.
+
 Doing it by hand is two commands per plugin:
 
 ```bash

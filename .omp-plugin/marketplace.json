@@ -53,7 +53,7 @@
     {
       "name": "deepseek-flash-vision",
       "description": "Declares deepseek-flash as an image-capable model in omp and stops the transport from stripping image parts, so an attached screenshot reaches DeepSeek-V4.1-Flash.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "development",
       "source": {
         "source": "github",

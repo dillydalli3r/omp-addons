@@ -141,8 +141,10 @@ function setupTokenSaver(dir) {
   }
   // The pack ships its own installer and registers extensions by editing config.yml. The marketplace
   // registration supersedes that, and both at once double-registers every command, so the legacy
-  // tree is removed first. `uninstall` leaves ~/.omp/plugins and the rtk binary alone.
-  let ok = run("supreme-token-saver: remove any legacy install", ...nodeFile(dir, "install-omp-addons.js", ["uninstall", "--yes"]));
+  // tree is removed first. `--legacy-only` removes the extensions and their config.yml entries and
+  // never touches ~/.omp/plugins or the rtk binary; `plugin` refuses to run while the legacy tree is
+  // still there, which is why this is the first thing that happens.
+  let ok = run("supreme-token-saver: remove any legacy install", ...nodeFile(dir, "install-omp-addons.js", ["uninstall", "--legacy-only", "--yes"]));
   // `plugin` installs the runtime dependencies only — ponytail and the rtk binary — and touches
   // neither the extension tree nor config.yml.
   ok = run("supreme-token-saver: install dependencies (ponytail, rtk)", ...nodeFile(dir, "install-omp-addons.js", ["plugin", "--yes"])) && ok;
