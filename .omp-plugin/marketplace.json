@@ -13,7 +13,7 @@
     {
       "name": "omp-suite",
       "description": "Startup update check and /omp-addons command for the whole set. Reports newer versions of the pack, the terminal-image patch and the DeepSeek vision override, and drives omp's own marketplace upgrade.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "category": "productivity",
       "source": "./plugins/omp-suite",
       "author": { "name": "dillydalli3r" },
