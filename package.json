@@ -1,0 +1,24 @@
+{
+  "name": "@dillydalli3r/omp-addons",
+  "version": "1.0.0",
+  "description": "One-command installer and marketplace catalog for the oh-my-pi add-on set: supreme token saver, inline terminal images, and DeepSeek Flash vision.",
+  "license": "MIT",
+  "author": "dillydalli3r",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dillydalli3r/omp-addons.git"
+  },
+  "homepage": "https://github.com/dillydalli3r/omp-addons",
+  "bin": {
+    "omp-addons": "install.mjs"
+  },
+  "scripts": {
+    "check": "node --check install.mjs && node --check plugins/omp-suite/extensions/omp-updater/index.js",
+    "test": "node --test",
+    "dry-run": "node install.mjs --dry-run --yes"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

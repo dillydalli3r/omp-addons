@@ -1,0 +1,23 @@
+{
+  "name": "@dillydalli3r/omp-suite",
+  "version": "1.0.0",
+  "description": "Startup update check and /omp-addons command for the oh-my-pi add-on set.",
+  "license": "MIT",
+  "author": "dillydalli3r",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dillydalli3r/omp-addons.git"
+  },
+  "homepage": "https://github.com/dillydalli3r/omp-addons",
+  "omp": {
+    "extensions": ["./extensions/omp-updater/index.js"]
+  },
+  "scripts": {
+    "check": "node --check extensions/omp-updater/index.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

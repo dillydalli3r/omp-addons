@@ -1,0 +1,69 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "omp-addons",
+  "owner": {
+    "name": "dillydalli3r",
+    "url": "https://github.com/dillydalli3r"
+  },
+  "metadata": {
+    "description": "The oh-my-pi add-on set: token economy, inline terminal images, DeepSeek vision, and the updater that keeps all three current.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "omp-suite",
+      "description": "Startup update check and /omp-addons command for the whole set. Reports newer versions of the pack, the terminal-image patch and the DeepSeek vision override, and drives omp's own marketplace upgrade.",
+      "version": "1.0.0",
+      "category": "productivity",
+      "source": "./plugins/omp-suite",
+      "author": { "name": "dillydalli3r" },
+      "license": "MIT",
+      "keywords": ["omp", "oh-my-pi", "updates", "addons"]
+    },
+    {
+      "name": "supreme-token-saver",
+      "description": "Nine token-saving knobs behind six presets (off to ultra): caveman replies, RTK shell compaction, ponytail code minimalism, auto-RTK, native read/compress/prune/threshold dials, and one status row.",
+      "version": "2.2.0",
+      "category": "productivity",
+      "source": {
+        "source": "github",
+        "repo": "dillydalli3r/omp-supreme-token-saver",
+        "ref": "main"
+      },
+      "homepage": "https://github.com/dillydalli3r/omp-supreme-token-saver",
+      "author": { "name": "dillydalli3r" },
+      "license": "MIT",
+      "keywords": ["tokens", "caveman", "rtk", "ponytail", "compaction"]
+    },
+    {
+      "name": "terminal-images",
+      "description": "Inline images in the omp TUI on Windows Terminal: forces the sixel protocol and patches the composer and transcript surfaces so pasted images render as pictures instead of chips.",
+      "version": "1.0.0",
+      "category": "productivity",
+      "source": {
+        "source": "github",
+        "repo": "dillydalli3r/omp-terminal-images",
+        "ref": "main"
+      },
+      "homepage": "https://github.com/dillydalli3r/omp-terminal-images",
+      "author": { "name": "dillydalli3r" },
+      "license": "MIT",
+      "keywords": ["tui", "images", "sixel", "windows-terminal"]
+    },
+    {
+      "name": "deepseek-flash-vision",
+      "description": "Declares deepseek-flash as an image-capable model in omp and stops the transport from stripping image parts, so an attached screenshot reaches DeepSeek-V4.1-Flash.",
+      "version": "1.0.0",
+      "category": "development",
+      "source": {
+        "source": "github",
+        "repo": "dillydalli3r/omp-deepseek-flash-vision",
+        "ref": "main"
+      },
+      "homepage": "https://github.com/dillydalli3r/omp-deepseek-flash-vision",
+      "author": { "name": "dillydalli3r" },
+      "license": "MIT",
+      "keywords": ["deepseek", "vision", "multimodal", "models.yml"]
+    }
+  ]
+}

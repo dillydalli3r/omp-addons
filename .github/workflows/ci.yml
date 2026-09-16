@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 22]
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Syntax check
+        run: npm run check
+      - name: Tests
+        run: npm test
+      - name: Installer is offline-safe
+        # A dry run must be a pure preview: no network, no writes, and no `omp` binary required.
+        # It is the guard against an installer that quietly needs GitHub reachable to print what it
+        # would do.
+        run: npm run dry-run
