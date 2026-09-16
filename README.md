@@ -10,7 +10,7 @@ from inside a session.
 
 | Plugin | Repository | What it does |
 |---|---|---|
-| `omp-suite` | this repo | Startup update check and the `/omp-addons` command |
+| `omp-suite` | this repo | On-demand version check and the `/omp-addons` command |
 | `supreme-token-saver` | [omp-supreme-token-saver](https://github.com/dillydalli3r/omp-supreme-token-saver) | Nine token-saving knobs behind six presets, one status row, OMP's own read/compress/prune/threshold dials |
 | `terminal-images` | [omp-terminal-images](https://github.com/dillydalli3r/omp-terminal-images) | Inline images in the TUI on Windows Terminal, including pasted images in the composer and transcript |
 | `deepseek-flash-vision` | [omp-deepseek-flash-vision](https://github.com/dillydalli3r/omp-deepseek-flash-vision) | Declares `deepseek-flash` as image-capable and stops the transport from stripping image parts |
@@ -65,16 +65,17 @@ knows to run them, which is why it exists.
 
 ## Updates
 
-`omp-suite` checks at session start, at most once every six hours, and notifies only when something
-is actually behind. Nothing blocks the first prompt: the check runs off the turn and an unreachable
-GitHub costs nothing but a retry next time.
+Nothing in this set prints at session start. The version check is on demand — it runs when you ask for
+it, and a session that never asks never pays for a fetch:
 
 ```
 /omp-addons            status — installed vs published version, per project
-/omp-addons check      force a network check now
+/omp-addons check      check the published versions now
 /omp-addons update     refresh the catalog and reinstall anything behind
-/omp-addons level on|off   check at session start (on by default)
 ```
+
+`/ai-addons check` is the token saver's check, for its own dependencies (ponytail, the `rtk` binary,
+the caveman rule).
 
 omp has its own knob for the same idea, which this set leaves alone:
 
@@ -82,16 +83,13 @@ omp has its own knob for the same idea, which this set leaves alone:
 omp config set marketplace.autoUpdate auto     # off | notify (default) | auto
 ```
 
-`notify` writes update availability to the debug log only, which is why the suite reports in-session
-instead. `auto` upgrades plugins from the catalog without asking; the suite still reports, so you can
-tell what changed.
-
-The token saver has dependencies of its own — ponytail, the `rtk` binary, and the caveman rule text.
-Those are checked by the pack's own `/ai-addons check` and `/ai-addons update`, and by the same
-startup check.
+`notify` writes update availability to the debug log only, which is exactly the trade this set makes
+in-session: available when asked for, silent otherwise. `auto` upgrades plugins from the catalog
+without asking.
 
 Two things are deliberately not auto-updated, because they rewrite software you did not ask them to
-rewrite:
+rewrite. Each says so when it had to repair something — that one notice is the only launch output any
+plugin in this set produces:
 
 - **The terminal-image bundle patch.** `install.ps1` edits `@oh-my-pi/pi-coding-agent/dist/cli.js`.
   Any omp upgrade replaces that file and silently reverts the fix, so the patch is re-detected at
@@ -104,7 +102,7 @@ rewrite:
 - `omp` on `PATH` (tested against 18.2.x)
 - Node 18+ for the installer, `bun` for omp itself
 - The terminal-image half is Windows Terminal only, and needs WT 1.22+ for SIXEL
-- Network access for the marketplace, npm installs, and the startup check
+- Network access for the marketplace, npm installs, and `/omp-addons check`
 
 ## On disk
 
@@ -114,8 +112,6 @@ rewrite:
 ~/.omp/plugins/omp-plugins.lock.json                 runtime enable/feature state
 ~/.omp/plugins/node_modules/<package>                symlink into the plugin cache
 ~/.omp/plugins/cache/plugins/omp-addons___<plugin>___<version>/
-~/.omp/agent/omp-addons.json                         suite config (startup check on/off)
-~/.omp/agent/omp-addons-state.json                   last check, last notice
 ```
 
 Nothing here edits `~/.omp/agent/config.yml` `extensions:`; the marketplace registration is the

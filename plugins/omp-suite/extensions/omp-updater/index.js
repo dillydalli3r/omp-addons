@@ -1,4 +1,7 @@
-// OMP extension: /omp-addons — startup update check, status and upgrade for the omp-addons set.
+// OMP extension: /omp-addons — status and upgrade for the omp-addons set.
+//
+// Nothing here runs at session start: an update notice is a launch print, and this set prints
+// nothing on launch. `/omp-addons` (status) and `/omp-addons check` are the surface.
 //
 // Built-in Node modules only: the suite is installed from this marketplace and has no dependency
 // tree of its own, so there is nothing here for a package manager to keep current.
@@ -13,9 +16,6 @@ import path from "node:path";
 
 const IS_WINDOWS = process.platform === "win32";
 const HOME = os.homedir();
-const AGENT_DIR = process.env.PI_CODING_AGENT_DIR || path.join(HOME, ".omp", "agent");
-const STATE_PATH = path.join(AGENT_DIR, "omp-addons-state.json");
-const CONFIG_PATH = path.join(AGENT_DIR, "omp-addons.json");
 const MARKETPLACE = "omp-addons";
 const BRANCH = "main";
 const RELOAD_MSG = "Restart omp for an upgraded plugin to take effect.";
@@ -52,8 +52,6 @@ const PROJECTS = [
   },
 ];
 
-const DEFAULT_CONFIG = { checkOnStart: true, intervalHours: 6 };
-
 // ---------------------------------------------------------------------------
 // paths and small helpers
 
@@ -74,19 +72,6 @@ async function readJson(file) {
   } catch {
     return null;
   }
-}
-
-async function writeJson(file, value) {
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.writeFile(file, `${JSON.stringify(value, null, 2)}\n`, "utf8");
-}
-
-async function loadConfig() {
-  const raw = (await readJson(CONFIG_PATH)) || {};
-  return {
-    checkOnStart: raw.checkOnStart !== false,
-    intervalHours: Number.isFinite(raw.intervalHours) && raw.intervalHours > 0 ? raw.intervalHours : DEFAULT_CONFIG.intervalHours,
-  };
 }
 
 function cliCommand(name, args) {
@@ -217,40 +202,10 @@ function renderStatus(rows) {
   return ["omp-addons", `  marketplace: ${MARKETPLACE}`, ...lines].join("\n");
 }
 
-async function runCheck(ctx, { announce = true } = {}) {
+async function runCheck(ctx) {
   const rows = await checkProjects();
   notify(ctx, `omp-addons: ${summarize(rows)}`, rows.some((row) => row.update || row.error) ? "warning" : "info");
   return rows;
-}
-
-// Startup runs off the turn, so a slow or unreachable GitHub never delays the first prompt. The
-// timestamp is written before the fetch, so a machine that is offline at every start does not
-// re-attempt the whole set on every session.
-async function runStartupCheck(pi, ctx) {
-  const config = await loadConfig();
-  if (!config.checkOnStart) return;
-  const state = (await readJson(STATE_PATH)) || {};
-  const since = Date.now() - (Number(state.lastCheck) || 0);
-  if (since < config.intervalHours * 3600_000) return;
-  await writeJson(STATE_PATH, { ...state, lastCheck: Date.now() });
-
-  let rows;
-  try {
-    rows = await checkProjects();
-  } catch (cause) {
-    return;
-  }
-  const updates = rows.filter((row) => row.update);
-  const signature = updates.map(updateLine).join("|");
-  if (!updates.length) {
-    await writeJson(STATE_PATH, { lastCheck: Date.now(), notified: "" });
-    return;
-  }
-  // One notice per distinct set of updates: a session that is restarted repeatedly must not repeat
-  // the same nags without a new release behind them.
-  if (state.notified === signature) return;
-  notify(ctx, `omp-addons: ${summarize(rows)} — run /omp-addons update`, "warning");
-  await writeJson(STATE_PATH, { ...state, lastCheck: Date.now(), notified: signature });
 }
 
 async function upgrade(pi, ctx, rows) {
@@ -282,15 +237,12 @@ async function upgrade(pi, ctx, rows) {
   }
   const failed = outcomes.some((line) => line.includes("failed"));
   notify(ctx, failed ? "omp-addons: upgrade finished with errors." : `omp-addons: upgraded. ${RELOAD_MSG}`, failed ? "warning" : "info");
-  await writeJson(STATE_PATH, { lastCheck: Date.now(), notified: "" });
 }
 
 const USAGE = [
   "/omp-addons            status — installed vs published version, per project",
-  "/omp-addons check      force a network check now",
+  "/omp-addons check      check the published versions now",
   "/omp-addons update     refresh the catalog and reinstall anything behind",
-  "/omp-addons level      show the stored level",
-  "/omp-addons level on|off   check at session start (stored for new sessions)",
   "/omp-addons help",
 ].join("\n");
 
@@ -305,15 +257,6 @@ export default function ompAddonsSuite(pi) {
       notify(ctx, USAGE, "info");
       return;
     }
-    if (verb === "level") {
-      const config = await loadConfig();
-      if (parts[1] === "on" || parts[1] === "off") {
-        await writeJson(CONFIG_PATH, { ...(await readJson(CONFIG_PATH)) || {}, checkOnStart: parts[1] === "on" });
-      }
-      const now = await loadConfig();
-      notify(ctx, `omp-addons: startup check ${now.checkOnStart ? "on" : "off"}, every ${now.intervalHours}h (${CONFIG_PATH})`, "info");
-      return;
-    }
     if (verb === "check") {
       await runCheck(ctx);
       return;
@@ -326,16 +269,11 @@ export default function ompAddonsSuite(pi) {
   };
 
   pi.registerCommand("omp-addons", {
-    description: "Status, update check and upgrade for the omp-addons set. Usage: /omp-addons <status|check|update|level|help>",
+    description: "Status, version check and upgrade for the omp-addons set. Usage: /omp-addons <status|check|update|help>",
     handler,
   });
   pi.registerCommand("addons", {
     description: "Alias for /omp-addons.",
     handler,
-  });
-
-  pi.on("session_start", (_event, ctx) => {
-    // Fire and forget: the handler resolves immediately so startup is never gated on GitHub.
-    runStartupCheck(pi, ctx).catch(() => {});
   });
 }

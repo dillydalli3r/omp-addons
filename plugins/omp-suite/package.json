@@ -1,7 +1,7 @@
 {
   "name": "@dillydalli3r/omp-suite",
-  "version": "1.0.3",
-  "description": "Startup update check and /omp-addons command for the oh-my-pi add-on set.",
+  "version": "1.0.4",
+  "description": "On-demand update check and /omp-addons command for the oh-my-pi add-on set. Prints nothing at session start.",
   "license": "MIT",
   "author": "dillydalli3r",
   "type": "module",

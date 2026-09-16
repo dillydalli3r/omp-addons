@@ -1,38 +1,29 @@
 # omp-suite
 
 The updater for the [omp-addons](../..) set. It ships no token economy, no images and no model
-patches — it tells you when one of the other three is behind, and installs it when you say so.
+patches — it reports when one of the other three is behind, and installs it when you say so.
 
 ## Commands
 
 | Command | Effect |
 |---|---|
 | `/omp-addons` | Status: installed vs published version for each project in the set |
-| `/omp-addons check` | Force a network check now |
+| `/omp-addons check` | Check the published versions now |
 | `/omp-addons update` | Refresh the catalog and reinstall anything behind |
-| `/omp-addons level on\|off` | Check at session start (on by default) |
 | `/omp-addons help` | Usage |
 
-## Startup check
+## Nothing runs at session start
 
-At session start, off the turn, at most once per `intervalHours` (default 6):
+The extension registers no `session_start` hook: an update notice is a launch print, and this set
+prints nothing on launch. The version check is on demand only — `/omp-addons` or
+`/omp-addons check` — so a session that never asks never pays for a fetch.
 
-1. Read each plugin's installed version from `~/.omp/plugins/node_modules/<package>/package.json`,
-   falling back to `omp-plugins.lock.json`.
-2. Read each repository's published version from `raw.githubusercontent.com/<repo>/main/package.json`
-   — no API token, no rate limit.
-3. Notify once, with one line, only when something is genuinely behind. The same set of updates is
-   never announced twice; a new release produces a new notice.
+A check reads, per project:
 
-State lives in `~/.omp/agent/omp-addons-state.json` (`lastCheck`, `notified`). Config lives in
-`~/.omp/agent/omp-addons.json`:
-
-```json
-{ "checkOnStart": true, "intervalHours": 6 }
-```
-
-The timestamp is written *before* the fetch, so a machine that is offline at every start does not
-re-attempt the whole set on every session.
+1. The installed version from `~/.omp/plugins/node_modules/<package>/package.json`, falling back to
+   `omp-plugins.lock.json`.
+2. The published version from `raw.githubusercontent.com/<repo>/main/package.json` — no API token,
+   no rate limit.
 
 ## What it does not do
 

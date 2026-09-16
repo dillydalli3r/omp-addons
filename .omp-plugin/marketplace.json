@@ -12,8 +12,8 @@
   "plugins": [
     {
       "name": "omp-suite",
-      "description": "Startup update check and /omp-addons command for the whole set. Reports newer versions of the pack, the terminal-image patch and the DeepSeek vision override, and drives omp's own marketplace upgrade.",
-      "version": "1.0.3",
+      "description": "On-demand update check and /omp-addons command for the whole set. Reports newer versions of the pack, the terminal-image patch and the DeepSeek vision override, and drives omp's own marketplace upgrade. Prints nothing at session start.",
+      "version": "1.0.4",
       "category": "productivity",
       "source": "./plugins/omp-suite",
       "author": { "name": "dillydalli3r" },
@@ -23,7 +23,7 @@
     {
       "name": "supreme-token-saver",
       "description": "Nine token-saving knobs behind six presets (off to ultra): caveman replies, RTK shell compaction, ponytail code minimalism, auto-RTK, native read/compress/prune/threshold dials, and one status row.",
-      "version": "2.2.0",
+      "version": "2.3.0",
       "category": "productivity",
       "source": {
         "source": "github",
