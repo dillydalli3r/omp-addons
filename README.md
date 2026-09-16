@@ -146,6 +146,11 @@ npm run dry-run    # the installer must stay offline-safe and write nothing
 `install.mjs` is held to the same rule the token saver's installer is: a dry run performs no network
 call and no write, so it can be run anywhere, any time.
 
+Each plugin entry in `.omp-plugin/marketplace.json` pins the version its repository publishes. Keep
+the two in step when a plugin releases: `omp plugin upgrade` compares the catalog entry, while the
+suite's own check reads the installed `package.json`. A catalog entry left behind makes the two
+disagree about what "behind" means.
+
 ## License
 
 MIT

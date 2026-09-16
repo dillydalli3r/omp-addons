@@ -38,7 +38,7 @@
     {
       "name": "terminal-images",
       "description": "Inline images in the omp TUI on Windows Terminal: forces the sixel protocol and patches the composer and transcript surfaces so pasted images render as pictures instead of chips.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "productivity",
       "source": {
         "source": "github",
