@@ -6,7 +6,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { cmpVersion, summarize } from "../plugins/omp-suite/extensions/omp-updater/index.js";
+import { cmpVersion, manifestUrl, summarize } from "../plugins/omp-suite/extensions/omp-updater/index.js";
 
 function row(over) {
   return { id: "x", local: "1.0.0", remote: "1.0.0", error: null, installed: true, update: false, ...over };
@@ -32,6 +32,19 @@ test("cmpVersion never reports a downgrade as an update", () => {
   const local = "2.2.0";
   assert.equal(cmpVersion(local, local) > 0, false);
   assert.equal(cmpVersion("2.1.9", local) > 0, false);
+});
+
+test("manifestUrl reads the repository root unless the plugin lives deeper", () => {
+  // The suite is a plugin inside its own marketplace repository, so its manifest is not at the
+  // root — reading the root there compared the wrong file and hid the suite's own releases.
+  assert.equal(
+    manifestUrl({ repo: "dillydalli3r/omp-terminal-images" }),
+    "https://raw.githubusercontent.com/dillydalli3r/omp-terminal-images/main/package.json",
+  );
+  assert.equal(
+    manifestUrl({ repo: "dillydalli3r/omp-addons", path: "plugins/omp-suite/package.json" }),
+    "https://raw.githubusercontent.com/dillydalli3r/omp-addons/main/plugins/omp-suite/package.json",
+  );
 });
 
 test("summarize names every update with both versions", () => {

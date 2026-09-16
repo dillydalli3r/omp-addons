@@ -22,7 +22,8 @@ const RELOAD_MSG = "Restart omp for an upgraded plugin to take effect.";
 const FETCH_TIMEOUT_MS = 6000;
 
 // `plugin` is the name in this marketplace's catalog; `pkg` is the package.json name the install is
-// keyed by in node_modules and omp-plugins.lock.json.
+// keyed by in node_modules and omp-plugins.lock.json; `path` is where that package.json sits in the
+// repository — the suite lives in a subdirectory of its own repo, so it cannot assume the root.
 const PROJECTS = [
   {
     id: "supreme-token-saver",
@@ -47,6 +48,7 @@ const PROJECTS = [
     plugin: "omp-suite",
     pkg: "@dillydalli3r/omp-suite",
     repo: "dillydalli3r/omp-addons",
+    path: "plugins/omp-suite/package.json",
   },
 ];
 
@@ -116,8 +118,13 @@ async function localVersion(pkg) {
 // The repo's own package.json on the default branch — the same file the marketplace clone carries,
 // so it is the version the next install would land on. Clones are raw-fetched, not API-fetched:
 // no rate limit, no auth, and no token needed on a machine that has never run `gh auth login`.
-async function remoteVersion(repo) {
-  const url = `https://raw.githubusercontent.com/${repo}/${BRANCH}/package.json`;
+// Exported for the tests; the extension loader only ever takes the default export.
+export function manifestUrl(project) {
+  return `https://raw.githubusercontent.com/${project.repo}/${BRANCH}/${project.path || "package.json"}`;
+}
+
+async function remoteVersion(project) {
+  const url = manifestUrl(project);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
@@ -163,7 +170,7 @@ async function checkProjects() {
       let remote = null;
       let error = null;
       try {
-        remote = await remoteVersion(project.repo);
+        remote = await remoteVersion(project);
       } catch (cause) {
         error = cause?.message || String(cause);
       }
